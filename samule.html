@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+    <script src="samule.js"></script>
+    <link rel="stylesheet" type="text/css" href="samule-theme.css">
+    <link rel="stylesheet" type="text/css" href="samule.css">
+    </head>
+    <body onload=init()>
+        <div id="profileSel">
+            <label for="profileName">Authenticate against profile name:</label>
+            <select id="defaultProfile" class="hidden"></select>
+            <input id="profileName" />
+            <button id="launch" disabled>Start CLI</button>
+        </div>
+        <div id="filePanel">
+            <label for="configFile">AWS Config File: (cmd+shft+period reveals hidden folders)</label>
+            <input type="file" id="configFile" name="configFile" single />
+        </div>
+        <div id="actionText"></div>
+        <div id="infoText">
+            <p>Optionally choose your aws config file to populate a profile dropdown.</p>
+            <p>Type or select a profile name to authenticate against.</p>
+            <p>Click the Start CLI button to authenticate with the choosen profile name.</p>
+        </div>
+    </body>
+  </html>

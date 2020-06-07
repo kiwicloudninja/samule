@@ -1,0 +1,26 @@
+{
+    "name": "SAMuLe",
+    "version": "0.1",
+    "description": "Copies SAML tokens and opens them with SAMuLe, an iTerm2 AWSCLI-SAML Launcher",
+    "permissions": ["declarativeContent", "storage"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "page_action": {
+        "default_popup": "samule.html",
+        "default_icon": {
+            "16": "imgs/samule-logo-16.png",
+            "32": "imgs/samule-logo-32.png",
+            "64": "imgs/samule-logo-64.png",
+            "128": "imgs/samule-logo-128.png"
+        }
+    },
+    "icons": {
+        "16": "imgs/samule-logo-16.png",
+        "32": "imgs/samule-logo-32.png",
+        "64": "imgs/samule-logo-64.png",
+        "128": "imgs/samule-logo-128.png"
+    },
+    "manifest_version": 2
+}
