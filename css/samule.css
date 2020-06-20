@@ -23,7 +23,8 @@ body {
 }
 
 #actionText,
-#infoText {
+#infoText,
+#samlStatus {
     padding-left: 10px;
 }
 
@@ -32,6 +33,7 @@ body {
 }
 
 #samlBox {
+  min-height: 180px;
   margin-right: 8px;
   box-shadow: inset 2px 2px 5px #babecc, inset -5px -5px 10px #fff;
   width: 100%;
@@ -51,4 +53,94 @@ body {
 
 .visible {
     display: block;
+}
+
+/* Cool spinner modified from: https://codepen.io/bronzebygold/pen/YBEjKo */
+#loadingSAML {
+  --spinner: #4d4e54;
+  --center: translate(-50%, -50%);
+}
+.center {
+   position: absolute;
+   width: 10px;
+   height: 10px;
+   background: var(--spinner);
+   border-radius: 50%;
+   bottom: 80px;
+   left: 50%;
+   transform: var(--center);
+   animation: swell 2s linear infinite;
+}
+.outer-spin, .inner-spin {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+}
+.outer-spin {
+  animation: ospin 4s linear infinite;
+}
+.outer-arc, .inner-arc {
+  position: absolute;
+  border-radius: 50%;
+  border: 4px solid;
+}
+.outer-arc {
+  width: 80px;
+  height: 80px;
+}
+.outer-arc_start-a {
+  border-color: transparent transparent transparent var(--spinner);
+  /*NOTE: the order here very much matters!  */
+  transform: var(--center) rotate(65deg);
+}
+.outer-arc_end-a {
+  border-color: var(--spinner) transparent transparent transparent;
+  transform: var(--center) rotate(45deg);
+}
+.outer-arc_start-b {
+  border-color: transparent transparent transparent var(--spinner);
+  transform: var(--center) rotate(65deg) scale(-1, -1);
+}
+.outer-arc_end-b {
+  border-color: var(--spinner) transparent transparent transparent;
+  transform: var(--center) rotate(45deg) scale(-1, -1);
+}
+
+.inner-spin {
+  animation: ispin 2s linear infinite;
+}
+.inner-arc {
+  width: 40px;
+  height: 40px;
+}
+.inner-arc_start-a {
+  border-color: transparent transparent transparent var(--spinner);
+/*NOTE: the order here very much matters!  */
+  transform: var(--center) rotate(65deg);
+}
+.inner-arc_end-a {
+  border-color: var(--spinner) transparent transparent transparent;
+  transform: var(--center) rotate(45deg);
+}
+.inner-arc_start-b {
+  border-color: transparent transparent transparent var(--spinner);
+  transform: var(--center) rotate(65deg) scale(-1, -1);
+}
+.inner-arc_end-b {
+  border-color: var(--spinner) transparent transparent transparent;
+  transform: var(--center) rotate(45deg) scale(-1, -1);
+}
+@keyframes ispin {
+  0% {transform: rotate(-90deg); }
+  50% {transform: rotate(180deg); }
+  100% {transform: rotate(-90deg); }
+}
+@keyframes ospin {
+  0% {transform: rotate(180deg); }
+  50% {transform: rotate(-90deg); }
+  100% {transform: rotate(360deg); }
+}
+
+@keyframes swell {
+  50% {transform: scale(1.5,1.5) translate(-3px,-3px); }
 }
