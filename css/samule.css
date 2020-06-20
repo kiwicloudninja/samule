@@ -1,24 +1,28 @@
 body {
-    width: 450px;
-}
-#profileName {
-    float: left;
-    width:35%;
+    width: 380px;
+    padding:10px;
+    box-shadow: inset 2px 2px 5px #fff, inset -5px -5px 10px #babecc;
+    border-radius: 10px;
+    margin:2px;
 }
 
-#defaultProfile {
-    float: left;
+#profileSel {
+    margin-bottom:20px;
+    width:95%;
+}
+
+#optionsBtn {
+  float:right;
+}
+#profileName {
+    width:35%;
 }
 
 #launch {
     float:right;
 }
 
-#profileSel {
-    margin-bottom:80px;
-}
-
-#filePanel {
+#infoText {
     clear: both;
 }
 
