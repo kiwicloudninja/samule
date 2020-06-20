@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+	<title>'SAMuLe iTerm2 AWSCLI-SAML Launcher'</title>
+	<link rel="stylesheet" type="text/css" href="../css/samule-theme.css">
+	<link rel="stylesheet" type="text/css" href="../css/options.css">
+	<script src="../js/options.js"></script>
+	</head>
+	<body>
+		<div id="divSettings">
+			<div id="divFilename">
+				<label for="configFile">AWS Config File: (cmd+shft+period reveals hidden folders)</label>
+	            <input type="file" id="configFile" name="configFile" single />
+			</div>
+			<div id="divProfile">
+				<label for="defaultProfile">Default Profile</label>
+				<select id="defaultProfile"></select>
+			</div>
+			<div id="divTerm">
+				<label>Use iTerm
+					<input id="iterm" name="iterm" type="checkbox" value="iterm" />
+				</label>
+			</div>
+			<div id="infoText">
+	            <p><i>Select a default profile by loading your aws config file.</i></p>
+				<p><i><a href="https://www.iterm2.com/" target="_blank">iTerm</a> is a macOS Terminal replacement</i></p>
+	        </div>
+			<div id="divAuth">
+				<hr />
+				<label for="iPD">Google idpid (<i>A00abcd1a</i>)</label>
+				<input id="idpid" name="idpid" />
+				<label for="spid">Google spid (<i>1234567890</i>)</label>
+				<input id="spid" name="spid" />
+				<button id="saveAuth">Save</button>
+			</div>
+		</div>
+	</body>
+</html>

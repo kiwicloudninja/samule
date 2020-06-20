@@ -1,14 +1,18 @@
 {
     "name": "SAMuLe",
     "version": "0.1",
-    "description": "Copies SAML tokens and opens them with SAMuLe, an iTerm2 AWSCLI-SAML Launcher",
-    "permissions": ["declarativeContent", "storage"],
+    "author": "Shane Davis <shane@kiwicloudninja.com>",
+    "description": "Captures SAML tokens and opens them with SAMuLe, an AWSCLI Launcher that uses aws-saml.",
+    "permissions": ["storage", "webRequest", "tabs", "https://signin.aws.amazon.com/saml"],
     "background": {
-        "scripts": ["background.js"],
-        "persistent": false
+        "page": "html/background.html"
     },
-    "page_action": {
-        "default_popup": "samule.html",
+    "options_ui": {
+        "page": "html/options.html",
+        "open_in_tab": false
+    },
+    "browser_action": {
+        "default_popup": "html/samule.html",
         "default_icon": {
             "16": "imgs/samule-logo-16.png",
             "32": "imgs/samule-logo-32.png",

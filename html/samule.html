@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+    <script src="../js/samule.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/samule-theme.css">
+    <link rel="stylesheet" type="text/css" href="../css/samule.css">
+    </head>
+    <body>
+        <div id="profileSel">
+            <select id="selectProfile"></select>
+            <label for="profileName">Authenticate CLI against profile name:</label>
+            <input id="profileName" />
+            <button id="launch" disabled>Start CLI</button>
+        </div>
+        <div id="infoText">
+            <p>Type a profile name to authenticate against.</p>
+            <p>Click the Start CLI button to authenticate with the choosen profile name.</p>
+        </div>
+        <div id="samlBox">
+            <hr />
+            <div id="samlStatus">
+                <p>Google Auth Options are needed.</p>
+                <input type="hidden" id="spid" name="spid" />
+                <input type="hidden" id="idpid" name="idpid" />
+            </div>
+            <div id="samlText">
+            </div>
+            <div id="actionText"></div>
+        </div>
+    </body>
+  </html>

@@ -38,14 +38,14 @@ select {
   outline: 0;
   font-size: 16px;
   border-radius: 320px;
-  padding: 16px;
+  padding: 10px;
   background-color: #ebecf0;
   text-shadow: 1px 1px 0 #fff;
 }
 
 label {
   display: block;
-  margin: 10px 30px;
+  margin: 10px 10px;
   width: 100%;
 }
 
@@ -61,6 +61,13 @@ input
 }
 input:focus {
   box-shadow: inset 1px 1px 2px #babecc, inset -1px -1px 2px #fff;
+}
+
+input[type="checkbox"] {
+    appearance: auto;
+    -webkit-appearance: auto;
+    width: 20px;
+    height:20px;
 }
 
 select

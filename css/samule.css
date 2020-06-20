@@ -1,0 +1,54 @@
+body {
+    width: 450px;
+}
+#profileName {
+    float: left;
+    width:35%;
+}
+
+#defaultProfile {
+    float: left;
+}
+
+#launch {
+    float:right;
+}
+
+#profileSel {
+    margin-bottom:80px;
+}
+
+#filePanel {
+    clear: both;
+}
+
+#actionText,
+#infoText {
+    padding-left: 10px;
+}
+
+#actionText {
+    margin-top: 10px;
+}
+
+#samlText {
+  margin-right: 8px;
+  box-shadow: inset 2px 2px 5px #babecc, inset -5px -5px 10px #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  border-radius: 10px;
+  padding: 1px 20px;
+}
+
+#btnPanel {
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
