@@ -67,13 +67,17 @@ function updateTokenText() {
     SamlTextEl.innerHTML = "";
     if (RoleDomNodes.length > 1) {
         for (i = 0; i < RoleDomNodes.length; i++) {
-          var NodeValue = RoleDomNodes[i].innerHTML.split(",", 1)[0];
-          var RoleStart = NodeValue.search("role/") + 5;
-          if(RoleStart > 4)
-            SamlTextEl.innerHTML += "<p>" + NodeValue.substr(RoleStart) + "</p>";
+          var NodeValues = RoleDomNodes[i].innerHTML.split(",");
+          var SamlRole = "";
+          for(ir = 0; ir < NodeValues.length; ir++) {
+              RoleStart = NodeValues[ir].search("role/");
+              if(RoleStart > 0)
+                SamlRole = NodeValues[ir].substr(RoleStart + 5);
+          };
+          SamlTextEl.innerHTML += "<p>" + SamlRole + "</p>";
+        }
+        enableLaunchBtn();
     }
-    enableLaunchBtn();
-  }
 }
 
 function updateProfileSel(e) {
