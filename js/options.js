@@ -15,6 +15,9 @@ function init() {
     var saveAuthBtn = document.getElementById('saveAuth');
     saveAuthBtn.addEventListener('click', saveAuthVals, false);
 
+    var clearAuthBtn = document.getElementById('clearAuth');
+    clearAuthBtn.addEventListener('click', clearAuthVals, false);
+
     chrome.storage.sync.get({
         profiles: ['default'],
         default: 'default',
@@ -42,8 +45,17 @@ function saveAuthVals() {
     var spidVal = document.getElementById('spid').value;
     var idpidVal = document.getElementById('idpid').value;
 
-    chrome.storage.sync.set({spid: spidVal, idpid: idpidVal});
+    var today = new Date();
 
+    chrome.storage.sync.set({spid: spidVal, idpid: idpidVal});
+    document.getElementById("optsStatus").innerHTML = "Updated " + today.toLocaleTimeString();
+}
+
+function clearAuthVals() {
+  document.getElementById('spid').value = "";
+  document.getElementById('idpid').value = "";
+
+  saveAuthVals();
 }
 
 function saveTermVal() {
