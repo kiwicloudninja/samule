@@ -2,10 +2,11 @@
 window.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
-    var launchBtn = document.getElementById('launch');
-    var profileName = document.getElementById('profileName');
-    var spidEl = document.getElementById('spid');
-    var idpidEl = document.getElementById('idpid');
+    var LaunchBtn = document.getElementById('launch');
+    var OptionsBtn = document.getElementById('optionsBtn');
+    var ProfileNameEl = document.getElementById('profileName');
+    var SPidEl = document.getElementById('spid');
+    var IDpidEl = document.getElementById('idpid');
 
     chrome.storage.sync.get({
         profiles: ['default'],
@@ -14,22 +15,123 @@ function init() {
         idpid: '',
     }, function(items) {
         enableProfileSelect(items.profiles, items.default)
-        profileName.value = items.default;
-        spidEl.value = items.spid;
-        idpidEl.value = items.idpid;
+        ProfileNameEl.value = items.default;
+        SPidEl.value = items.spid;
+        IDpidEl.value = items.idpid;
         updateTokenText();
         enableLaunchBtn();
     });
 
-    launchBtn.onclick = launchCLI;
-    profileName.onkeyup = enableLaunchBtn;
-
+    LaunchBtn.onclick = launchCLI;
+    ProfileNameEl.onkeyup = enableLaunchBtn;
+    OptionsBtn.onclick = viewOptions;
 }
 
-function closeBGWindow(windowID) {
-    console.log("Closing Window ", windowID);
-    chrome.windows.remove(windowID);
+function updateTokenText() {
+    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+
+    SamlStatusEl = document.getElementById('samlStatus');
+    SamlLoadingEl = document.getElementById('loadingSAML');
+    SamlHintEl = document.getElementById('samlHint');
+
+    if(! SAMLToken) {
+        var SPidVal = document.getElementById('spid').value;
+        var IDpidVal = document.getElementById('idpid').value;
+
+        if(SPidVal && IDpidVal) {
+            SamlHintEl.className = "hidden";
+            SamlLoadingEl.className = "visible";
+            SamlStatusEl.innerHTML = "Loading SAML Token in background window..."
+            var AuthURL = `https://accounts.google.com/o/saml2/initsso?idpid=${IDpidVal}&spid=${SPidVal}&forceauthn=false`;
+            openBGWindow(AuthURL, updateTokenText);
+        }
+        return;
+    }
+    SamlHintEl.className = "hidden";
+    SamlLoadingEl.className = "hidden";
+    SamlStatusEl.innerHTML = '<p>Available Roles <span id="samlDuration"></span>:</p>';
+    SamlTextEl = document.getElementById('samlText');
+
+    Parser = new DOMParser()
+    DOMDoc = Parser.parseFromString(SAMLToken, "text/xml");
+
+    var RoleDomNodes = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
+    var SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
+
+    if(SessionDuration) {
+        Duration = parseInt(SessionDuration.innerHTML)/60;
+        Mins = Duration%60 > 0?` ${Duration%60} mins`:"";
+        Hours = Duration/60 >= 1?` ${Math.floor(Duration/60)} hrs`:"";
+        document.getElementById('samlDuration').innerHTML = ` (Session Duration ${Hours}${Mins})`;
+    }
+    SamlTextEl.innerHTML = "";
+    if (RoleDomNodes.length > 1) {
+        for (i = 0; i < RoleDomNodes.length; i++) {
+          var NodeValue = RoleDomNodes[i].innerHTML.split(",", 1)[0];
+          var RoleStart = NodeValue.search("role/") + 5;
+          if(RoleStart > 4)
+            SamlTextEl.innerHTML += "<p>" + NodeValue.substr(RoleStart) + "</p>";
+    }
+    enableLaunchBtn();
+  }
 }
+
+function updateProfileSel(e) {
+  document.getElementById('profileName').value = e.target.value;
+}
+
+function enableProfileSelect(ProfileList, DefaultProfile) {
+    var ProfileSel = document.getElementById('selectProfile');
+    var ProfileNameEl = document.getElementById('profileName');
+
+    ProfileSel.onchange = updateProfileSel;
+    ProfileSel.onclick = updateProfileSel;
+
+    if(ProfileList) {
+        ProfileList.forEach(function(ElText) {
+            var El = document.createElement("option");
+            El.textContent = ElText;
+            El.value = ElText;
+            ProfileSel.appendChild(El);
+        });
+    }
+    ProfileSel.value = DefaultProfile;
+}
+
+function enableLaunchBtn() {
+    var LaunchBtn = document.getElementById('launch');
+    var ProfileName = document.getElementById('profileName').value;
+    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+
+    LaunchBtn.disabled = !ProfileName || !SAMLToken;
+
+    if(SAMLToken) {
+      if(LaunchBtn.disabled)
+        hint = "<p>Type a profile name to authenticate against.</p>";
+      else
+        hint = "<p>Click the Start CLI button to authenticate with the choosen profile name.</p>";
+
+      document.getElementById('infoText').innerHTML = hint;
+    }
+}
+
+function launchCLI(e) {
+    var ProfileName = document.getElementById('profileName').value;
+    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+
+    document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
+
+    var TermURL = `samule://${ProfileName}?token=${btoa(SAMLToken)}`;
+    openBGWindow(TermURL, updateTokenText);
+}
+
+function viewOptions(e) {
+    if (chrome.runtime.openOptionsPage)
+      chrome.runtime.openOptionsPage();
+    else
+      window.open(chrome.runtime.getURL('options.html'));
+}
+
 
 function openBGWindow(targetURL, callback=null) {
     chrome.windows.create(
@@ -46,91 +148,6 @@ function openBGWindow(targetURL, callback=null) {
         setTimeout(callback, 3000)
 }
 
-
-function updateTokenText() {
-    var bg = chrome.extension.getBackgroundPage();
-    var SAMLToken = bg.SAMLToken;
-    var authURL = "https://accounts.google.com/o/saml2/initsso?idpid=C00lvep1m&spid=108192152471&forceauthn=false";
-
-    SamlBox = document.getElementById('samlBox');
-    SamlStatus = document.getElementById('samlStatus');
-
-    if(! SAMLToken) {
-        var spidVal = document.getElementById('spid').value;
-        var idpidVal = document.getElementById('idpid').value;
-
-        if(spidVal != "" && idpidVal != "")
-            SamlStatus.innerHTML = "Loading SAML Token in background window..."
-            var authURL = `https://accounts.google.com/o/saml2/initsso?idpid=${idpidVal}&spid=${spidVal}&forceauthn=false`;
-            openBGWindow(authURL, updateTokenText);
-        return;
-    }
-    SamlStatus.innerHTML = '<p>Available Roles <span id="samlDuration"></span>:</p>';
-    SamlText = document.getElementById('samlText');
-    DurationText = document.getElementById('samlDuration');
-
-    parser = new DOMParser()
-    domDoc = parser.parseFromString(SAMLToken, "text/xml");
-
-    var roleDomNodes = domDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
-    var sessionDuration = domDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
-
-    if(sessionDuration) {
-        duration = parseInt(sessionDuration.innerHTML)/60;
-        mins = duration%60 > 0?` ${duration%60} mins`:"";
-        hours = duration/60 >= 1?` ${Math.floor(duration/60)} hrs`:"";
-        DurationText.innerHTML = ` (Session Duration ${hours}${mins})`;
-    }
-    SamlText.innerHTML = "";
-    if (roleDomNodes.length > 1) {
-        for (i = 0; i < roleDomNodes.length; i++) {
-          var nodeValue = roleDomNodes[i].innerHTML.split(",", 1)[0];
-          var roleStart = nodeValue.search("role/") + 5;
-          if(roleStart > 4)
-            SamlText.innerHTML += "<p>" + nodeValue.substr(roleStart) + "</p>";
-    }
-    enableLaunchBtn();
-  }
-}
-
-function enableProfileSelect(profileList, defaultProfile) {
-    var defaultSelect = document.getElementById('selectProfile');
-    var profileName = document.getElementById('profileName');
-
-    defaultSelect.onchange = function(e) {
-        profileName.value = e.target.value;
-    }
-
-    if(profileList) {
-        profileList.forEach(function(elText) {
-            var el = document.createElement("option");
-            el.textContent = elText;
-            el.value = elText;
-            defaultSelect.appendChild(el);
-        });
-    }
-    defaultSelect.value = defaultProfile;
-}
-
-function enableLaunchBtn() {
-    var launchBtn = document.getElementById('launch');
-    var profileName = document.getElementById('profileName');
-    var bg = chrome.extension.getBackgroundPage();
-    var SAMLToken = bg.SAMLToken;
-
-    launchBtn.disabled = profileName.value == "" || !SAMLToken;
-}
-
-function launchCLI(e) {
-    var profileName = document.getElementById('profileName');
-    var actionText = document.getElementById('actionText');
-    var bg = chrome.extension.getBackgroundPage();
-    var SAMLToken = bg.SAMLToken;
-
-    console.log("Token:", btoa(SAMLToken));
-
-    actionText.innerHTML = "Launching samule://" + profileName.value + " in background";
-
-    var termURL = `samule://${profileName.value}?token=${btoa(SAMLToken)}`;
-    openBGWindow(termURL, updateTokenText);
+function closeBGWindow(windowID) {
+    chrome.windows.remove(windowID);
 }

@@ -13,17 +13,20 @@
             <button id="launch" disabled>Start CLI</button>
         </div>
         <div id="infoText">
-            <p>Type a profile name to authenticate against.</p>
-            <p>Click the Start CLI button to authenticate with the choosen profile name.</p>
+            <p>Navigating to AWS sign in via Google SSO will obtain a token.</p>
         </div>
-        <div id="samlBox">
+        <div id="samlSection">
             <hr />
-            <div id="samlStatus">
-                <p>Google Auth Options are needed.</p>
-                <input type="hidden" id="spid" name="spid" />
-                <input type="hidden" id="idpid" name="idpid" />
-            </div>
-            <div id="samlText">
+            <input type="hidden" id="spid" name="spid" />
+            <input type="hidden" id="idpid" name="idpid" />
+            <div id="samlStatus"></div>
+            <div id="samlBox">
+              <img id="loadingSAML" src="../imgs/loading.gif" class="hidden">
+              <div id="samlHint">
+                <p>Configure Google Auth in Options to autoload a SAML Token.</p>
+                <button id="optionsBtn">Options</button>
+              </div>
+              <div id="samlText"></div>
             </div>
             <div id="actionText"></div>
         </div>
