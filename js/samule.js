@@ -1,3 +1,4 @@
+var UseiTerm = false;
 
 window.addEventListener('DOMContentLoaded', init, false);
 
@@ -13,11 +14,14 @@ function init() {
         default: 'default',
         spid: '',
         idpid: '',
+        iterm: false,
     }, function(items) {
         enableProfileSelect(items.profiles, items.default)
         ProfileNameEl.value = items.default;
         SPidEl.value = items.spid;
         IDpidEl.value = items.idpid;
+        UseiTerm = items.iterm;
+
         updateTokenText();
         enableLaunchBtn();
     });
@@ -57,7 +61,7 @@ function updateTokenText() {
 
     var RoleDomNodes = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
     var SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
-
+    
     if(SessionDuration) {
         Duration = parseInt(SessionDuration.innerHTML)/60;
         Mins = Duration%60 > 0?` ${Duration%60} mins`:"";
@@ -123,10 +127,16 @@ function launchCLI(e) {
     var ProfileName = document.getElementById('profileName').value;
     var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
 
-    document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
+    var TermStr = UseiTerm?"?term=iterm":"";
+    var TermURL = `samule://${ProfileName}${TermStr}`;
 
-    var TermURL = `samule://${ProfileName}?token=${btoa(SAMLToken)}`;
-    openBGWindow(TermURL, updateTokenText);
+    navigator.clipboard.writeText(btoa(SAMLToken)).then(function() {
+        document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
+        setTimeout(function(){ document.getElementById('actionText').innerHTML = "" }, 3000);
+        openBGWindow(TermURL, updateTokenText);
+    }, function() {
+        document.getElementById('actionText').innerHTML = "Unable to access clipboard!";
+    });
 }
 
 function viewOptions(e) {

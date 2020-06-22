@@ -3,7 +3,7 @@
     "version": "0.1",
     "author": "Shane Davis <shane@kiwicloudninja.com>",
     "description": "Captures SAML tokens and opens them with SAMuLe, an AWSCLI Launcher that uses aws-saml.",
-    "permissions": ["storage", "webRequest", "tabs", "https://signin.aws.amazon.com/saml"],
+    "permissions": ["storage", "webRequest", "tabs", "clipboardWrite", "https://signin.aws.amazon.com/saml"],
     "background": {
         "page": "html/background.html"
     },
