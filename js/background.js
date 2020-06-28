@@ -1,5 +1,4 @@
 // Global variables
-var DebugLogs = false;
 var SAMLToken = ""
 
 addOnBeforeRequestEventListener();
@@ -25,22 +24,46 @@ function removeOnBeforeRequestEventListener() {
 // Callback for each request to https://signin.aws.amazon.com/saml
 function onBeforeRequestEvent(details) {
   // Decode base64 SAML assertion in the request
-  var samlXmlDoc = "";
-  var formDataPayload = undefined;
+  let samlXmlDoc = "";
+  let formDataPayload = undefined;
   if (details.requestBody.formData) {
     samlXmlDoc = decodeURIComponent(unescape(window.atob(details.requestBody.formData.SAMLResponse[0])));
   } else if (details.requestBody.raw) {
-    var combined = new ArrayBuffer(0);
+    let combined = new ArrayBuffer(0);
     details.requestBody.raw.forEach(function(element) {
-      var tmp = new Uint8Array(combined.byteLength + element.bytes.byteLength);
+      let tmp = new Uint8Array(combined.byteLength + element.bytes.byteLength);
       tmp.set( new Uint8Array(combined), 0 );
       tmp.set( new Uint8Array(element.bytes),combined.byteLength );
       combined = tmp.buffer;
     });
-    var combinedView = new DataView(combined);
-    var decoder = new TextDecoder('utf-8');
+    const combinedView = new DataView(combined);
+    const decoder = new TextDecoder('utf-8');
     formDataPayload = new URLSearchParams(decoder.decode(combinedView));
     samlXmlDoc = decodeURIComponent(unescape(window.atob(formDataPayload.get('SAMLResponse'))))
   }
   SAMLToken = samlXmlDoc;
+  setTimeout(expireToken, 301000);
+}
+
+function diff_minutes(NowDate, EndDate)
+ {
+     const DiffMS = NowDate - EndDate;
+     return Math.floor((DiffMS/1000)/60);
+ }
+
+function expireToken()
+{
+    const Parser = new DOMParser();
+    const DOMDoc = Parser.parseFromString(SAMLToken, "text/xml");
+
+    const ExpiryEl = DOMDoc.querySelector('SubjectConfirmationData');
+    const SAMLExpiry = Date.parse(ExpiryEl.getAttribute('NotOnOrAfter'));
+
+    const expired = Date.now() > SAMLExpiry;
+
+    if(expired) {
+        SAMLToken = "";
+        expired = diff_minutes(SAMLExpiry, Date.now());
+        console.log(`Token Expired ${expired} minutes ago`);
+    }
 }

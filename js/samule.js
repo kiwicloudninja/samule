@@ -5,6 +5,7 @@ window.addEventListener('DOMContentLoaded', init, false);
 function init() {
     var LaunchBtn = document.getElementById('launch');
     var OptionsBtn = document.getElementById('optionsBtn');
+    var TokenBtn = document.getElementById('getToken');
     var ProfileNameEl = document.getElementById('profileName');
     var SPidEl = document.getElementById('spid');
     var IDpidEl = document.getElementById('idpid');
@@ -26,9 +27,21 @@ function init() {
         enableLaunchBtn();
     });
 
+    TokenBtn.onclick = updateTokenText;
     LaunchBtn.onclick = launchCLI;
     ProfileNameEl.onkeyup = enableLaunchBtn;
     OptionsBtn.onclick = viewOptions;
+}
+
+function enableRefreshToken() {
+    GetTokenBtn = document.getElementById('getToken');
+
+    document.getElementById('samlStatus').innerHTML = "Click Refresh Token button to obtain a new token.";
+    document.getElementById('actionText').innerHTML = "SAML Token expired.";
+    document.getElementById('samlText').innerHTML = "";
+
+    GetTokenBtn.className = "visible";
+    enableLaunchBtn();
 }
 
 function updateTokenText() {
@@ -37,6 +50,8 @@ function updateTokenText() {
     SamlStatusEl = document.getElementById('samlStatus');
     SamlLoadingEl = document.getElementById('loadingSAML');
     SamlHintEl = document.getElementById('samlHint');
+    GetTokenBtn = document.getElementById('getToken');
+    GetTokenBtn.className = "hidden";
 
     if(! SAMLToken) {
         var SPidVal = document.getElementById('spid').value;
@@ -59,9 +74,18 @@ function updateTokenText() {
     Parser = new DOMParser()
     DOMDoc = Parser.parseFromString(SAMLToken, "text/xml");
 
-    var RoleDomNodes = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
-    var SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
-    
+    const RoleDomNodes = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
+    const SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
+    const ExpiryEl = DOMDoc.querySelector('SubjectConfirmationData');
+    const SAMLExpiry = Date.parse(ExpiryEl.getAttribute('NotOnOrAfter'));
+    const dt = new Date(SAMLExpiry);
+    const expiry = dt.toLocaleTimeString();
+
+    document.getElementById('actionText').innerHTML = `SAML Token expires at ${expiry}`;
+    const Expiry = SAMLExpiry - Date.now();
+    setTimeout(enableRefreshToken, Expiry)
+    console.log("Expiring token in ", Expiry);
+
     if(SessionDuration) {
         Duration = parseInt(SessionDuration.innerHTML)/60;
         Mins = Duration%60 > 0?` ${Duration%60} mins`:"";
