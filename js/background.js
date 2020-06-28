@@ -63,7 +63,5 @@ function expireToken()
 
     if(expired) {
         SAMLToken = "";
-        expired = diff_minutes(SAMLExpiry, Date.now());
-        console.log(`Token Expired ${expired} minutes ago`);
     }
 }

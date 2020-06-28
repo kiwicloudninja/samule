@@ -1,14 +1,14 @@
 var UseiTerm = false;
+var SPid = "";
+var IDpid = "";
 
 window.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
-    var LaunchBtn = document.getElementById('launch');
-    var OptionsBtn = document.getElementById('optionsBtn');
-    var TokenBtn = document.getElementById('getToken');
-    var ProfileNameEl = document.getElementById('profileName');
-    var SPidEl = document.getElementById('spid');
-    var IDpidEl = document.getElementById('idpid');
+    const LaunchBtn = document.getElementById('launch');
+    const OptionsBtn = document.getElementById('optionsBtn');
+    const TokenBtn = document.getElementById('getToken');
+    const ProfileNameEl = document.getElementById('profileName');
 
     chrome.storage.sync.get({
         profiles: ['default'],
@@ -19,8 +19,8 @@ function init() {
     }, function(items) {
         enableProfileSelect(items.profiles, items.default)
         ProfileNameEl.value = items.default;
-        SPidEl.value = items.spid;
-        IDpidEl.value = items.idpid;
+        SPid = items.spid;
+        IDpid = items.idpid;
         UseiTerm = items.iterm;
 
         updateTokenText();
@@ -45,7 +45,7 @@ function enableRefreshToken() {
 }
 
 function updateTokenText() {
-    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+    const SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
 
     SamlStatusEl = document.getElementById('samlStatus');
     SamlLoadingEl = document.getElementById('loadingSAML');
@@ -54,14 +54,11 @@ function updateTokenText() {
     GetTokenBtn.className = "hidden";
 
     if(! SAMLToken) {
-        var SPidVal = document.getElementById('spid').value;
-        var IDpidVal = document.getElementById('idpid').value;
-
-        if(SPidVal && IDpidVal) {
+        if(SPid && IDpid) {
             SamlHintEl.className = "hidden";
             SamlLoadingEl.className = "visible";
             SamlStatusEl.innerHTML = "Loading SAML Token in background window..."
-            var AuthURL = `https://accounts.google.com/o/saml2/initsso?idpid=${IDpidVal}&spid=${SPidVal}&forceauthn=false`;
+            const AuthURL = `https://accounts.google.com/o/saml2/initsso?idpid=${IDpid}&spid=${SPid}&forceauthn=false`;
             openBGWindow(AuthURL, updateTokenText);
         }
         return;
@@ -95,8 +92,8 @@ function updateTokenText() {
     SamlTextEl.innerHTML = "";
     if (RoleDomNodes.length > 1) {
         for (i = 0; i < RoleDomNodes.length; i++) {
-          var NodeValues = RoleDomNodes[i].innerHTML.split(",");
-          var SamlRole = "";
+          const NodeValues = RoleDomNodes[i].innerHTML.split(",");
+          let SamlRole = "";
           for(ir = 0; ir < NodeValues.length; ir++) {
               RoleStart = NodeValues[ir].search("role/");
               if(RoleStart > 0)
@@ -113,15 +110,15 @@ function updateProfileSel(e) {
 }
 
 function enableProfileSelect(ProfileList, DefaultProfile) {
-    var ProfileSel = document.getElementById('selectProfile');
-    var ProfileNameEl = document.getElementById('profileName');
+    const ProfileSel = document.getElementById('selectProfile');
+    const ProfileNameEl = document.getElementById('profileName');
 
     ProfileSel.onchange = updateProfileSel;
     ProfileSel.onclick = updateProfileSel;
 
     if(ProfileList) {
         ProfileList.forEach(function(ElText) {
-            var El = document.createElement("option");
+            let El = document.createElement("option");
             El.textContent = ElText;
             El.value = ElText;
             ProfileSel.appendChild(El);
@@ -131,9 +128,9 @@ function enableProfileSelect(ProfileList, DefaultProfile) {
 }
 
 function enableLaunchBtn() {
-    var LaunchBtn = document.getElementById('launch');
-    var ProfileName = document.getElementById('profileName').value;
-    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+    const LaunchBtn = document.getElementById('launch');
+    const ProfileName = document.getElementById('profileName').value;
+    const SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
 
     LaunchBtn.disabled = !ProfileName || !SAMLToken;
 
@@ -148,11 +145,11 @@ function enableLaunchBtn() {
 }
 
 function launchCLI(e) {
-    var ProfileName = document.getElementById('profileName').value;
-    var SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+    const ProfileName = document.getElementById('profileName').value;
+    const SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
 
-    var TermStr = UseiTerm?"?term=iterm":"";
-    var TermURL = `samule://${ProfileName}${TermStr}`;
+    const TermStr = UseiTerm?"?term=iterm":"";
+    const TermURL = `samule://${ProfileName}${TermStr}`;
 
     navigator.clipboard.writeText(btoa(SAMLToken)).then(function() {
         document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
