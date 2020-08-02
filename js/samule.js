@@ -1,4 +1,5 @@
 var UseiTerm = false;
+var HiddenLaunch = false;
 var SPid = "";
 var IDpid = "";
 
@@ -16,12 +17,14 @@ function init() {
         spid: '',
         idpid: '',
         iterm: false,
+        applaunch: false,
     }, function(items) {
         enableProfileSelect(items.profiles, items.default)
         ProfileNameEl.value = items.default;
         SPid = items.spid;
         IDpid = items.idpid;
         UseiTerm = items.iterm;
+        HiddenLaunch = items.applaunch;
 
         updateTokenText();
         enableLaunchBtn();
@@ -46,6 +49,7 @@ function enableRefreshToken() {
 
 function updateTokenText() {
     const SAMLToken = chrome.extension.getBackgroundPage().SAMLToken;
+    console.log(SAMLToken);
 
     SamlStatusEl = document.getElementById('samlStatus');
     SamlLoadingEl = document.getElementById('loadingSAML');
@@ -72,9 +76,17 @@ function updateTokenText() {
     DOMDoc = Parser.parseFromString(SAMLToken, "text/xml");
 
     const RoleDomNodes = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/Role"]')[0].childNodes
-    const SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
-    const ExpiryEl = DOMDoc.querySelector('SubjectConfirmationData');
-    const SAMLExpiry = Date.parse(ExpiryEl.getAttribute('NotOnOrAfter'));
+    var SAMLExpiry;
+    var SessionDuration = 0;
+    if(DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]').length > 0) {
+      SessionDuration = DOMDoc.querySelectorAll('[Name="https://aws.amazon.com/SAML/Attributes/SessionDuration"]')[0].childNodes[0]
+      const ExpiryEl = DOMDoc.querySelector('SubjectConfirmationData');
+      SAMLExpiry = Date.parse(ExpiryEl.getAttribute('NotOnOrAfter'));
+    }
+    else {
+      SAMLExpiry = new Date();
+      SAMLExpiry.setMinutes(SAMLExpiry.getMinutes() + 5);
+    }
     const dt = new Date(SAMLExpiry);
     const expiry = dt.toLocaleTimeString();
 
@@ -88,6 +100,9 @@ function updateTokenText() {
         Mins = Duration%60 > 0?` ${Duration%60} mins`:"";
         Hours = Duration/60 >= 1?` ${Math.floor(Duration/60)} hrs`:"";
         document.getElementById('samlDuration').innerHTML = ` (Session Duration ${Hours}${Mins})`;
+    }
+    else {
+      document.getElementById('samlDuration').innerHTML = " (Session Duration 12 hrs)";
     }
     SamlTextEl.innerHTML = "";
     if (RoleDomNodes.length > 1) {
@@ -154,7 +169,7 @@ function launchCLI(e) {
     navigator.clipboard.writeText(btoa(SAMLToken)).then(function() {
         document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
         setTimeout(function(){ document.getElementById('actionText').innerHTML = "" }, 3000);
-        openBGWindow(TermURL, updateTokenText);
+        openBGWindow(TermURL, updateTokenText, HiddenLaunch);
     }, function() {
         document.getElementById('actionText').innerHTML = "Unable to access clipboard!";
     });
@@ -168,15 +183,20 @@ function viewOptions(e) {
 }
 
 
-function openBGWindow(targetURL, callback=null) {
+function openBGWindow(targetURL, callback=null, hidden=true) {
+    const WindowState = hidden?"minimized":"normal";
+    console.log("Window State", WindowState);
+    console.log("Hidden", hidden);
+    console.log("AppLaunch", HiddenLaunch);
     chrome.windows.create(
         {
             url: targetURL,
             type: "normal",
-            focused: false,
-            state: "minimized"
+            focused: !hidden,
+            state: WindowState
         }, function(hiddenWindow) {
-            setTimeout(function(){ closeBGWindow(hiddenWindow.id); }, 5000)
+            if(hidden)
+                setTimeout(function(){ closeBGWindow(hiddenWindow.id); }, 5000)
         }
     );
     if(callback)

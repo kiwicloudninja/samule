@@ -24,10 +24,12 @@ function init() {
         spid: '',
         idpid: '',
         iterm: false,
+        applaunch: false,
     }, function(items) {
         enableProfileSelect(items.profiles, items.default);
         updateAuthOpts(items.spid, items.idpid);
         updateTerm(items.iterm);
+        updateAppLaunch(items.applaunch)
     });
 
     enableSaveAuth();
@@ -63,11 +65,23 @@ function saveTermVal() {
     chrome.storage.sync.set({iterm: termVal});
 }
 
+function saveAppVal() {
+    const appVal = document.getElementById('applaunch').checked;
+    chrome.storage.sync.set({applaunch: appVal});
+}
+
 function updateTerm(checkedVal) {
     const iTermEl = document.getElementById('iterm');
     iTermEl.addEventListener('click', saveTermVal, false);
 
     iTermEl.checked = checkedVal;
+}
+
+function updateAppLaunch(checkedVal) {
+    const AppEl = document.getElementById('applaunch');
+    AppEl.addEventListener('click', saveAppVal, false);
+
+    AppEl.checked = checkedVal;
 }
 
 function updateAuthOpts(spidVal, idpidVal) {
