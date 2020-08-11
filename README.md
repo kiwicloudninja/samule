@@ -2,9 +2,50 @@
 
 ## Introduction
 
-This project aims to provide an easy to use boilerplate for chrome extensions, showcasing communication between its different scripts.
+Provides seamless single click AWS CLI authentication from Chrome using Google Federation SAML tokens in the background.
 
-Not all extensions will need of all scripts or all types of messaging. All code snippets are optional. Text and images should be replaced with your own.
+## Getting started
+
+For the extension to work you need to install https://pypi.org/project/awscli-saml/
+
+    pip install awscli-saml
+
+Copy the SAMuLe helper app to Applications and double click it so that the URL helper is installed in macOS. SAMuLe invokes the helper app with samule:// from the Chrome browser address bar which in turn launches macOS terminal (default) or iTerm, so long as you have the latter selected in the options.
+
+With the helper app set up; load the extension in Chrome and set up it's options.
+Load your ~/.aws/config file so you can select the AWS profile you want to commence a CLI session with. Hold SHFT-CMD-FULLSTOP to reveal hidden files in Finder.
+
+![SAMuLe Options](docs/options.png)
+
+When you provide your Google idpid and spid the SAMuLe extention is able to fire up the AWS Federated access page in the background and grab the SAML token. See below for notes on getting this to work smoothly.
+
+Now that the SAMuLe helper app is ready, you've loaded your ~/.aws/config profiles, and set your Google ids (optional), you're ready to start the CLI with a single click.
+
+When you're signed into your Google account in Chrome, new blank tabs show the Google apps grid icon. Click it and you should see the AWS app. Clicking this launches https://signin.aws.amazon.com/saml via the Google authentication page.
+
+![AWS Google Sign-in App](docs/aws-app.png)
+![AWS SAML page](docs/aws-saml.png)
+
+When you click on the SAMuLe extension you'll see a list of available accounts you can federate into with this token. So long as you have a profile selected, you can click on the start CLI button. Doing so copies the token to the clipboard, launches the SAMuLe helper app in a new tab and launches the terminal with aws-saml.
+
+![SAMuLe CLI](docs/samule.png)
+
+⚠️ Tokens only last five minutes. SAMuLe will show when the token will expire. A refresh button becomes available, but this only works if you have a single Google account. See below for details.
+
+## Multiple Google Accounts
+
+The extension operates the smoothest when you are only ever signed into one Google account in Chrome. If you have multiple Google accounts, the experience isn't quite so smooth as you have to select a Google account before the AWS Federated access page is displayed.
+
+The SAMuLe extension will work with multiple Google accounts. It's just best to navigate to the AWS Federated access page first.
+
+## Single Google Account
+
+When you've got a single Google account, you've got everything set up and working sweet, you can select the "Hide App Launch" option.
+The Google token page and SAMuLe launch window will open and close automatically in the background.
+
+⚠️ Unless you tell Chrome to always launch SAMuLe, you'll miss the prompt if the launch window is hidden and nothing will happen. To enable the dialog that prompts you to save you selection "Always open..." run the following command in Terminal and restart Chrome.
+
+    defaults write com.google.Chrome ExternalProtocolDialogShowAlwaysOpenCheckbox -bool true
 
 ## Installation
 
@@ -13,63 +54,3 @@ Clone the repo:
 ```
 git clone git@github.com:edrpls/chrome-extension-samule.git name-of-your-project
 ```
-
-Set git to track your own repository instead of this one:
-
-```
-git remote set-url --delete origin git@github.com:edrpls/chrome-extension-template.git # Remove old origin
-git remote set-url --add origin [YOUR REPO URL] # Add new origin
-```
-
-Install dependencies:
-
-```
-yarn install # or npm install
-```
-
-## Usage
-
-To run a development server that will watch for file changes and rebuild the scripts, run:
-
-```
-yarn start
-```
-
-To just build the files without the development server:
-
-```
-yarn build
-```
-
-Both commands will create a `dist/` directory, it will contain the built files that should be loaded into the browser or packed.
-
-## Load into Chrome
-
-To load the built files into Chrome, open [chrome://extensions/](chrome://extensions/).
-
-Enable "Developer mode" if it's not enabled yet:
-
-![Developer Mode Checkbox](assets/dev_mode.png)
-
-Click on "Load unpacked":
-
-![Load Unpacked Button](assets/load_unpacked.png)
-
-Find the `dist/` directory on your system and open it.
-
-The extension should be now at the top of the page:
-
-![Extension Loaded](assets/ext_loaded.png)
-
-## Publishing
-
-[Follow the official docs](https://developer.chrome.com/webstore/publish) to learn how to publish a Chrome extension.
-Please note that Google has its own process to review public extensions and using this boilerplate **does not guarantee** that the extension will pass it. Passing the review process is your responsibility!
-
-## External resources
-
-*   [Sample extension built with this template](https://github.com/edrpls/social-network-alert)
-
-*   [Chrome Developer Documentation](https://developer.chrome.com/extensions/devguide)
-
-*   [Overview slides about Chrome Extensions](https://github.com/edrpls/chrome-extensions-what-why-how)
