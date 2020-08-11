@@ -108,6 +108,7 @@ function enableProfileSelect(profileList, defaultProfile) {
     }
 
     if(profileList) {
+        defaultSelect.innerHTML = ""
         profileList.forEach(function(elText) {
             let el = document.createElement("option");
             el.textContent = elText;
@@ -127,7 +128,7 @@ function handleFileSelect(evt) {
     const text = reader.result;
     const awsConfig = parseINIString(text);
 
-    localProfiles = [];
+    var localProfiles = [];
     Object.keys(awsConfig).forEach(function(key) {
         let elText = key.replace("profile ", "");
         localProfiles.push(elText);
