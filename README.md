@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Provides seamless single click AWS CLI authentication from Chrome using Google Federation SAML tokens in the background.
+This Chrome extesion provides seamless single click AWS CLI authentication from Chrome using Google Federation SAML tokens in the background.
 
 ## Getting started
 
@@ -10,9 +10,14 @@ For the extension to work you need to install https://pypi.org/project/awscli-sa
 
     pip install awscli-saml
 
-Copy the SAMuLe helper app to Applications and double click it so that the URL helper is installed in macOS. SAMuLe invokes the helper app with samule:// from the Chrome browser address bar which in turn launches macOS terminal (default) or iTerm, so long as you have the latter selected in the options.
+Copy the SAMuLe helper app to Applications and double click it so that the URL helper is installed in macOS.
+
+    cp samule.app /Applications/
+
+SAMuLe invokes the helper app with samule:// from the Chrome browser address bar which in turn launches macOS terminal (default) or iTerm, so long as you have the latter selected in the options.
 
 With the helper app set up; load the extension in Chrome and set up it's options.
+
 Load your ~/.aws/config file so you can select the AWS profile you want to commence a CLI session with. Hold SHFT-CMD-FULLSTOP to reveal hidden files in Finder.
 
 ![SAMuLe Options](docs/options.png)
@@ -34,23 +39,24 @@ When you click on the SAMuLe extension you'll see a list of available accounts y
 
 ## Multiple Google Accounts
 
-The extension operates the smoothest when you are only ever signed into one Google account in Chrome. If you have multiple Google accounts, the experience isn't quite so smooth as you have to select a Google account before the AWS Federated access page is displayed.
+The extension operates the smoothest when you are only ever signed into one Google Apps/Suite account in Chrome. If you are signed into more than one Google account, it's highly recommended that you sign out of all accounts and use the Chrome Browser multiple users function instead.
 
-The SAMuLe extension will work with multiple Google accounts. It's just best to navigate to the AWS Federated access page first.
+### Chrome user profiles
+
+In the diagram below the red box labelled 1 shows me signed into two different Google Apps accounts.
+
+![SAMuLe CLI](docs/multiaccounts.png)
+
+I need to sign out of all accounts, which will allow me to remove an account when I go to sign in again.
+
+I can then click on the Chrome browser profile icon (2) and add another user which will have it's own extensions, Google sign in etc. This allows the features described in "Single Google Account" below to operate at their best.
+
 
 ## Single Google Account
 
-When you've got a single Google account, you've got everything set up and working sweet, you can select the "Hide App Launch" option.
+When you've got a single Google account, you've got everything set up and working correctly, you can select the "Hide App Launch" option.
 The Google token page and SAMuLe launch window will open and close automatically in the background.
 
 ⚠️ Unless you tell Chrome to always launch SAMuLe, you'll miss the prompt if the launch window is hidden and nothing will happen. To enable the dialog that prompts you to save you selection "Always open..." run the following command in Terminal and restart Chrome.
 
     defaults write com.google.Chrome ExternalProtocolDialogShowAlwaysOpenCheckbox -bool true
-
-## Installation
-
-Clone the repo:
-
-```
-git clone git@github.com:edrpls/chrome-extension-samule.git name-of-your-project
-```

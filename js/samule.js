@@ -61,9 +61,14 @@ function updateTokenText() {
         if(SPid && IDpid) {
             SamlHintEl.className = "hidden";
             SamlLoadingEl.className = "visible";
-            SamlStatusEl.innerHTML = "Loading SAML Token in background window..."
             const AuthURL = `https://accounts.google.com/o/saml2/initsso?idpid=${IDpid}&spid=${SPid}&forceauthn=false`;
-            openBGWindow(AuthURL, updateTokenText);
+            if(HiddenLaunch) {
+              SamlStatusEl.innerHTML = "Loading SAML Token in background window..."
+              openBGWindow(AuthURL, updateTokenText, HiddenLaunch);
+            }
+            else {
+              chrome.tabs.create({url: AuthURL, active: true});
+            }
         }
         return;
     }
@@ -169,7 +174,11 @@ function launchCLI(e) {
     navigator.clipboard.writeText(btoa(SAMLToken)).then(function() {
         document.getElementById('actionText').innerHTML = "Launching samule://" + ProfileName + " in background";
         setTimeout(function(){ document.getElementById('actionText').innerHTML = "" }, 3000);
-        openBGWindow(TermURL, updateTokenText, HiddenLaunch);
+        if (HiddenLaunch)
+          openBGWindow(TermURL, updateTokenText, HiddenLaunch);
+        else {
+          chrome.tabs.create({url: TermURL, active: true});
+        }
     }, function() {
         document.getElementById('actionText').innerHTML = "Unable to access clipboard!";
     });
@@ -183,7 +192,7 @@ function viewOptions(e) {
 }
 
 
-function openBGWindow(targetURL, callback=null, hidden=true) {
+function openBGWindow(targetURL, callback=null, hidden=false) {
     const WindowState = hidden?"minimized":"normal";
     console.log("Window State", WindowState);
     console.log("Hidden", hidden);
