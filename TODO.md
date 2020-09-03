@@ -4,4 +4,5 @@
 
 * Filter available profile selection to current SAML roles
 * Try to capture Google idpid and spid from new tab
-* Allow multiple Google profiles in options
+* Add native messaging option
+* Incorporate aws-saml into SAMuLe executable
